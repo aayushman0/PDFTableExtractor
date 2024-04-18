@@ -2,6 +2,8 @@ import sys
 import ntpath
 import pdfplumber
 from pdfminer.pdfdocument import PDFPasswordIncorrect
+from pdfminer.pdfparser import PDFException
+from pdfminer.psparser import PSException
 
 
 def table_extraction(pdf: pdfplumber.PDF, file_name: str) -> None:
@@ -64,6 +66,8 @@ def main(file_path: str) -> None:
         print(f"{file_path} doesn't exist.")
     except PDFPasswordIncorrect:
         protected_pdf(file_path)
+    except (PDFException, PSException):
+        print("Corrupt PDF file detected.")
     else:
         file_name = ntpath.basename(file_path)
         table_extraction(pdf_file, file_name)
@@ -71,8 +75,8 @@ def main(file_path: str) -> None:
 
 if __name__ == "__main__":
     argv = sys.argv
-    if len(argv) < 2:
-        print("Please pass filepath to pdf.")
-    else:
+    if len(argv) > 1:
         file_path = argv[1]
         main(file_path=file_path)
+    else:
+        print("Please input filepath of pdf.")
